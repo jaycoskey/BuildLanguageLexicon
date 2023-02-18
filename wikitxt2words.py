@@ -8,8 +8,10 @@ PATH_EO_OTHER_SOURCES = ['eo_other_source.txt']
 PATH_EO_CAPITALS      = 'eo_caps.txt'
 PATH_EO_WORDS         = 'eo_words.txt'
 
-RE_EO_IS_WORD   = re.compile(u'^[a-zA-ZĉĝĥĵŝŭĈĜĤĴŜŬ-]+\.?$')
-RE_EO_HAS_CAP   = re.compile(u'[A-ZĈĜĤĴŜŬ]')
+EO_CAPS         = u'ABCDEFGHIJKLMNOPRSTUVZĈĜĤĴŜŬ'
+EO_LOWERS       = u'abcdefghijklmnoprstuvzĉĝĥĵŝŭ'
+RE_EO_IS_WORD   = re.compile(u'^[' + EO_LOWERS + EO_CAPS + '-]+\.?$')
+RE_EO_HAS_CAP   = re.compile(u'[' + EO_CAPS + ']')
 RE_EO_HAS_VOWEL = re.compile(u'[aeiou]')
 
 EO_OTHER_SOURCE_BLOCKED = ["edz'-edzino"
@@ -32,6 +34,8 @@ def mk_primary_sets(fname_words, fname_caps):
     with open('wiki.txt', 'r') as f:
         for line in [line.strip().translate(tr_map)
                         for line in f.readlines()]:
+            if len(line) == 0 or (line[-1] == ':' and len(line.split()) <= 10):
+                continue  # Likely a page name. Might not be in target language.
             for word in [remove_final_period(w)
                            for w in line.split()
                            if re.search(RE_EO_IS_WORD, w) and len(w) > 1]:
